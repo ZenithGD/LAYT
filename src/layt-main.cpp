@@ -11,12 +11,6 @@ using namespace std;
 
 int main(int argc, char* argv[])
 {
-	cout << "Welcome to LAYT!" << endl;
-	if ( argc != 3 ) {
-		cerr << "Argument error, exiting..." << endl;
-		exit(1);
-	}
-
 	string layt(argv[1]), source_file(argv[2]);
 
 	// Parser object
@@ -31,11 +25,12 @@ int main(int argc, char* argv[])
 
 	vector<pair<string, vector<unsigned int>>> arg_vector = src_parser.parse_source(source_file);
 
+	// Show the evaluated
 	for ( auto args : arg_vector ) {
 		Instruction inst = isa.at(args.first);
 		uint32_t value = inst.eval(args.second);
-		cout << "bin: " << bitset<32>(value)
-				<< ", hex: 0x" << setfill('0') << setw(8) << hex << value
+		cout << "\e[1;4mbin:\e[0m " << bitset<32>(value)
+				<< ", \e[1;4mhex:\e[0m 0x" << setfill('0') << setw(8) << hex << value
 				<< dec << endl;
 	}
 	

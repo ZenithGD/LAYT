@@ -65,7 +65,7 @@ vector<pair<string, vector<unsigned int>>> SourceParser::parse_source(const stri
 	}
 	bool next;
 	vector<pair<string,vector<unsigned int>>> res;
-	cout << INFO << " Parsing..." << endl;
+	cout << INFO << " [2 of 2] Parsing source..." << endl;
 	do {
 		vector<unsigned int> param;
 		string name;

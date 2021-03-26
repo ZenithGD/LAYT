@@ -51,6 +51,7 @@ void LayoutParser::parse_fields(Instruction& inst)
 
 void LayoutParser::parse_layout(std::map<std::string, Instruction>& isa)
 {
+	cout << INFO << " [1 of 2] Parsing layout..." << endl;
 	string token;
 	_layt_in >> token;
 	while (!_layt_in.eof())
