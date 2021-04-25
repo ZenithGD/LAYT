@@ -14,7 +14,7 @@ SourceParser::SourceParser(map<string, Instruction>& isa)
 
 unsigned int parse_param(const string& arg)
 {
-	regex rNum("([0-9]+)");
+	regex rNum("#?([0-9]+)");
 	regex rReg("r([0-9]+)");
 	regex rAddr("\\(r([0-9]+)\\)");
 	smatch smN, smR, smAddr;

@@ -57,8 +57,6 @@ std::string Field::get_name() const
 	return _name;
 }
 
-
-
 bool Instruction::check_unique(const string& fieldname) 
 {
 	for ( auto e : _layout ) {
