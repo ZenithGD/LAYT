@@ -30,7 +30,7 @@ class parse_exception : public std::runtime_error
 	std::string _found; 
 	public:
 		parse_exception(const std::string& msg, const std::string& exp, const std::string& found);
-		std::string parse_status();
+		std::string parse_status() const;
 };
 
 void parse_xc_wrapper(parse_exception& xc, bool condition);
@@ -40,7 +40,15 @@ class src_parse_exception : public std::runtime_error
 	std::string _found; 
 	public:
 		src_parse_exception(const std::string& msg, const std::string& found);
-		std::string src_parse_status();
+		std::string src_parse_status() const;
 };
 
 void src_parse_xc_wrapper(src_parse_exception& xc, bool condition);
+
+class writer_open_exception : public std::runtime_error
+{
+	std::string _file_name;
+	public:
+		writer_open_exception(const std::string& msg, const std::string& fn);
+		std::string writer_open_exception_status() const;
+};

@@ -26,9 +26,9 @@ void layt_info_file(const char* info_msg, const char* source) {
 
 int main(int argc, char** argv)
 {
-	if ( argc != 3 ) {
+	if ( argc != 4 ) {
 		layt_error("Argument error\n");
-		printf("Usage: ./layt <layout file> <source file>\n");
+		printf("Usage: ./layt <layout file> <source file> <logisim_output>\n");
 		exit(1);
 	}
 
@@ -65,7 +65,7 @@ int main(int argc, char** argv)
 		pid_t pid_main = fork();
 		// execute the layout and source parser combo
 		if ( pid_main == 0 ) {
-			execlp("bin/layt-main", "bin/layt-main", argv[1], argv[2], (char*) NULL);
+			execlp("bin/layt-main", "bin/layt-main", argv[1], argv[2], argv[3], (char*) NULL);
 			layt_error("Execlp preprocessor error");
 			exit(1);
 		}

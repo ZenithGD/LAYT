@@ -23,7 +23,7 @@ parse_exception::parse_exception(const string &msg, const string& exp, const str
 {
 }
 
-string parse_exception::parse_status()
+string parse_exception::parse_status() const
 {
 	return "Expected \'" + _expect + "\', found \'" + _found + "\'.";
 }
@@ -46,7 +46,7 @@ src_parse_exception::src_parse_exception(const std::string& msg, const std::stri
 {	
 }
 
-std::string src_parse_exception::src_parse_status() 
+std::string src_parse_exception::src_parse_status() const
 {
 	return "Found \'" + _found + "\'.";
 }
@@ -61,4 +61,12 @@ void src_parse_xc_wrapper(src_parse_exception& xc, bool condition)
 		cout << ERR + " Source parsing exception: " << x.src_parse_status() << endl;
 		throw x;
 	}
+}
+
+writer_open_exception::writer_open_exception(const std::string& msg, const std::string& fn)
+	: runtime_error(msg), _file_name(fn) {}
+
+std::string writer_open_exception::writer_open_exception_status() const
+{
+	return "\'" + _file_name + "\' not found.";
 }

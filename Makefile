@@ -6,19 +6,18 @@ BIN = bin
 VPATH = $(LIBS) $(SRC)
 INCLUDES = -I. $(addprefix -I, $(VPATH))
 
+UTILS = Utils
 EXCEPTS = LaytExceptions
 INST = Instruction
-INST_DEPS = $(addprefix $(BUILD)/, $(INST).o $(EXCEPTS).o)
 PARSE = LayoutParser
-PARSE_DEPS = $(addprefix $(BUILD)/, $(INST).o $(PARSE).o $(EXCEPTS).o)
 SRC_PARSE = SourceParser
-SRC_PARSE_DEPS = $(addprefix $(BUILD)/, $(INST).o $(EXCEPTS).o)
+WRITER = LAYTWriter
 
 FLEX_SRC = lex.yy
 FLEX_FLAGS = -lfl
 
 MAIN = layt-main
-MAIN_DEPS = $(addprefix $(BUILD)/, $(INST).o $(PARSE).o $(MAIN).o $(EXCEPTS).o $(SRC_PARSE).o)
+MAIN_DEPS = $(addprefix $(BUILD)/, $(INST).o $(PARSE).o $(MAIN).o $(EXCEPTS).o $(SRC_PARSE).o $(UTILS).o $(WRITER).o)
 
 PREPROC = layt-preproc
 PPWRAPPER = layt-wrapper
@@ -47,9 +46,11 @@ $(BUILD)/%.o: %.cpp | $(BUILD)
 
 # additional required headers
 $(BUILD)/$(EXCEPTS).o: $(LIBS)/$(EXCEPTS).hpp $(LIBS)/$(INST).hpp
-$(BUILD)/$(PARSE).o: $(LIBS)/$(PARSE).hpp $(LIBS)/$(EXCEPTS).hpp $(LIBS)/$(INST).hpp
-$(BUILD)/$(SRC_PARSE).o: $(LIBS)/$(SRC_PARSE).hpp $(LIBS)/$(EXCEPTS).hpp $(LIBS)/$(INST).hpp
+$(BUILD)/$(PARSE).o: $(LIBS)/$(PARSE).hpp $(LIBS)/$(EXCEPTS).hpp $(LIBS)/$(INST).hpp $(LIBS)/$(UTILS).hpp
+$(BUILD)/$(SRC_PARSE).o: $(LIBS)/$(SRC_PARSE).hpp $(LIBS)/$(EXCEPTS).hpp $(LIBS)/$(INST).hpp $(LIBS)/$(UTILS).hpp
 $(BUILD)/$(INST).o: $(LIBS)/$(EXCEPTS).hpp $(LIBS)/$(INST).hpp
+$(BUILD)/$(UTILS).o: $(LIBS)/$(UTILS).hpp
+$(BUILD)/$(WRITER).o: $(LIBS)/$(WRITER).hpp $(LIBS)/$(EXCEPTS).hpp
 
 dirs:
 	mkdir -p bin build

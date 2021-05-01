@@ -6,14 +6,14 @@
 
 using namespace std;
 
-Instruction::Instruction(unsigned int opcode, unsigned int start, unsigned int end)
+Instruction::Instruction(uint32_t opcode, uint32_t start, uint32_t end)
 	: _opcode(opcode)
 {
-	Field op("#", start, end);
+	Field* op = new Field("#", start, end);
 	_layout.push_back(op);
 }
 
-Field::Field(const std::string& name, unsigned int start, unsigned int end) 
+Field::Field(const std::string& name, uint32_t start, uint32_t end) 
 	: _start_bit(start), _end_bit(end), _name(name)
 {
 	try {
@@ -28,7 +28,7 @@ Field::Field(const std::string& name, unsigned int start, unsigned int end)
 	}
 }
 
-uint32_t Field::eval(const unsigned int value) const
+uint32_t Field::eval(const uint32_t value) const
 {
 	try {
 		if ( value >= (1U << (_start_bit - _end_bit + 1U))) 
@@ -42,33 +42,62 @@ uint32_t Field::eval(const unsigned int value) const
 	return value << _end_bit;
 }
 
-unsigned int Field::get_start() const
+string Field::str_eval(const uint32_t value) const
+{
+	return to_string(value);
+}
+
+uint32_t Field::get_start() const
 {
 	return _start_bit;
 }
 
-unsigned int Field::get_end() const
+uint32_t Field::get_end() const
 {
 	return _end_bit;
 }
 
 std::string Field::get_name() const
 {
-	return _name;
+	return string(Field::_name);
+}
+
+InmediateField::InmediateField(const std::string& name, uint32_t start, uint32_t end) 
+	: Field(name, start, end) {}
+
+std::string InmediateField::str_eval(const uint32_t value) const 
+{
+	return "#" + Field::str_eval(value);
+}
+
+RegisterField::RegisterField(const std::string& name, uint32_t start, uint32_t end) 
+	: Field(name, start, end) {}
+
+std::string RegisterField::str_eval(const uint32_t value) const 
+{
+	return "r" + Field::str_eval(value);
+}
+
+AddressField::AddressField(const std::string& name, uint32_t start, uint32_t end) 
+	: Field(name, start, end) {}
+
+std::string AddressField::str_eval(const uint32_t value) const 
+{
+	return "(r" + Field::str_eval(value) + ")";
 }
 
 bool Instruction::check_unique(const string& fieldname) 
 {
 	for ( auto e : _layout ) {
-		if ( e.get_name() == fieldname ) return false;
+		if ( e->get_name() == fieldname ) return false;
 	}
 	return true;
 }
 
-bool Instruction::addField(const Field& field) 
+bool Instruction::addField(Field* field) 
 {
 	// TODO: check field overlapping
-	string fieldname = field.get_name();
+	string fieldname = field->get_name();
 	if ( !check_unique(fieldname) ) {
 		cout << WARN + " Warning: Duplicate fields can't be added (" + fieldname + ")" << endl;
 		return false;
@@ -79,7 +108,7 @@ bool Instruction::addField(const Field& field)
 	}
 }
 
-uint32_t Instruction::eval(const std::vector<unsigned int> args) const
+uint32_t Instruction::eval(const std::vector<uint32_t> args) const
 {
 	try {
 		if ( args.size() != _layout.size() - 1 )
@@ -96,15 +125,40 @@ uint32_t Instruction::eval(const std::vector<unsigned int> args) const
 	}
 	uint32_t word = 0U;
 	auto it = args.begin();
-	for ( Field field : _layout ) {
-		if ( field.get_name() == "#" ) {
-			word |= field.eval(_opcode);
+	for ( auto field : _layout ) {
+		if ( field->get_name() == "#" ) {
+			word |= field->eval(_opcode);
 		}
 		else {
-			word |= field.eval(*it);
+			word |= field->eval(*it);
 			it++;
 		}
 	}
+	return word;
+}
+
+string Instruction::eval_str(const std::vector<uint32_t> args) const
+{
+	try {
+		if ( args.size() != _layout.size() - 1 )
+			throw instruction_exception("too few arguments to evaluate");
+	}
+	catch ( instruction_exception& xc ) {
+		if ( args.size() < _layout.size() - 1) {
+			cout << ERR + " Instruction evaluation exception" << endl;
+			throw xc;
+		}
+		else {
+			cout << WARN + " Too many arguments to evaluate (" << args.size() << "), some of them will be ignored" << endl;
+		}
+	}
+	string word = "";
+	int lsiz = _layout.size();
+	for ( int i = 1; i < lsiz; i++ ) {
+		word += _layout[i]->str_eval(args[i - 1]);
+		if ( i < lsiz - 1 ) word += ", ";
+	}
+
 	return word;
 }
 

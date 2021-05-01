@@ -24,11 +24,12 @@ void LayoutParser::parse_fields(Instruction& inst)
 		
 		_layt_in >> token;
 		// read field data based on field type
-		regex r_field("(\\$|#|@)(.+)");
+		regex rx("(\\$|#|@)(.+)");
 		smatch sm;
 		parse_exception param_xc("Can't recognize field type", "($|#|@)<name>", token);
-		parse_xc_wrapper( param_xc, !regex_match(token, sm, r_field));
+		parse_xc_wrapper( param_xc, !regex_match(token, sm, rx));
 		string name = sm[2].str();
+		string type = sm[1].str();
 		_layt_in >> token;
 
 		unsigned int start, end;
@@ -39,9 +40,20 @@ void LayoutParser::parse_fields(Instruction& inst)
 		parse_exception range_xc("Not a range", ":", string(1, range_op));
 		parse_xc_wrapper( range_xc, range_op != ':' );
 
-		Field f(name, start, end);
+		Field* f;
+		if ( type == "$" ) 
+		{
+			f = new RegisterField(name, start, end);
+		}
+		else if ( type == "#" ) 
+		{
+			f = new InmediateField(name, start, end);
+		}
+		else if ( type == "@" ) 
+		{
+			f = new AddressField(name, start, end);	
+		}
 		inst.addField(f);
-
 		_layt_in >> token;
 	}
 
@@ -88,5 +100,4 @@ void LayoutParser::parse_layout(std::map<std::string, Instruction>& isa)
 
 LayoutParser::~LayoutParser() 
 {
-	
 }
